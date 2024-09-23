@@ -8,7 +8,7 @@ public class TrafficLightControlSys {
     private static final String MONITOR_HOST = "localhost";
     private static final int MONITOR_PORT = 6000; // port num
     private static final int LIGHT_INTERVAL = 2000; // setting light switch for 2 second
-// setting three traffic light
+    // setting three traffic light
     enum Light {
         RedLight, GreenLight, YellowLight
     }
@@ -56,7 +56,7 @@ public class TrafficLightControlSys {
             }
         }
 
-            catch (IOException | InterruptedException e) {
+        catch (IOException | InterruptedException e) {
             System.err.println("Exception: " + e.getMessage());
         }
     }

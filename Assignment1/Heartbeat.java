@@ -32,18 +32,8 @@ public class Heartbeat {
 
             readerThread.start();
 
-            // While loop to detect time out of heartbeat
-            while (true) {
-                if (System.currentTimeMillis()
-                        - lastHeartbeatTime[0] > TIMEOUT) {
-                    System.err.println("Heartbeat timeout! Traffic Light Controller may failed.");
-                    // Take action by setting lights to flashing yellow
-                    System.err.println("Setting traffic lights to flashing Red.");
-                    break;
-                }
-                // Check every 1 second
-                Thread.sleep(1000);
-            }
+
+
             //Waiting for the heartbeat reading thread to end
             readerThread.join();
         } catch (IOException | InterruptedException e) {
