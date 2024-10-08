@@ -1,7 +1,7 @@
 # Traffic Light System
 
 ### Overview
-This project implements heartbeat tactic to monitor Traffic Light using a Heartbeat Monitor process. The crash in TrafficLightControlSys is non-deterministic because it has a 20% random probability in each of the loop. And if monitor didn't revice the traffic light switch in 5 second then will crash. The traffic light should switch different color in 2 second.
+Implementing a fail-to-recover strategy through TrafficLightSecondary's code. Expanded upon the content of the previous assignment. We add TrafficLightSecond.java. This part will record the when you crush by txt file. And help TrafficLightControlSys.java continue execution where it failed.
 
 ### Team members
 - Liu Xu
@@ -9,10 +9,9 @@ This project implements heartbeat tactic to monitor Traffic Light using a Heartb
 
 
 ### Instructions
-1. Download the project into local machine.
-2. Compile the files.
-3. Run the HeartbeatMonitor.
-4. Run the TrafficLightControlSys.
+1. Run HeartBeat.java - Connecting and turning on the monitoring system
+2. Run TrafficLightControlSys - The switch traffic light will have a heartbeat every time it is switched, until a fault occurs. After you run the TrafficLightSecondary then run it again, itwill start counting from where he last recorded.
+3. Run TrafficLightSecondary-  The location of the last failure will be recorded.
 
 ### Frameworks Used
 - Java libraries

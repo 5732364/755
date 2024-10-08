@@ -1,14 +1,15 @@
-import java.io.IOException;
-import java.io.PrintWriter;
+package Assignment2;
+import java.io.*;
 import java.net.Socket;
 import java.util.Random;
 
 public class TrafficLightControlSys {
     private static final String MONITOR_HOST = "localhost";
     private static final int MONITOR_PORT = 6000; // port number
-    private static final int LIGHT_INTERVAL = 2000; // light switch interval (2 seconds)
+    private static final int LIGHT_INTERVAL = 2000; // setting light switch for 2 seconds
+    private static final String CHECKPOINT_FILE = "checkpoint.txt"; // file for storing checkpoint state
 
-    // Traffic light states
+    // enum is used for three traffic light states
     enum Light {
         RedLight, GreenLight, YellowLight
     }
@@ -22,12 +23,24 @@ public class TrafficLightControlSys {
             int heartbeatCount = 0;
             boolean failureOccurred = false; // flag to simulate failure
 
+            // Check if a checkpoint file exists and load state
+            File checkpointFile = new File(CHECKPOINT_FILE);
+            if (checkpointFile.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(checkpointFile));
+                currentLight = Light.valueOf(reader.readLine()); // Load last saved light state
+                heartbeatCount = Integer.parseInt(reader.readLine()); // Load last heartbeat count
+                reader.close();
+                System.out.println("Resumed from checkpoint with Light: " + currentLight + " and Heartbeat count: " + heartbeatCount);
+            } else {
+                System.out.println("Starting fresh......");
+            }
+
             while (true) {
                 // Simulate random failure with a 20% chance
                 if (!failureOccurred && random.nextInt(100) < 20) {
                     failureOccurred = true;
-                    System.out.println("A failure occurred in the Traffic Light System.");
-                    // After failure, stop sending heartbeats but continue running
+                    System.out.println("A failure occurred in the Traffic Light System. Stopping heartbeats.");
+                    // After failure, stop sending heartbeats but keep running
                 }
 
                 // Only send heartbeat if no failure occurred
@@ -35,6 +48,15 @@ public class TrafficLightControlSys {
                     out.println("HEARTBEAT " + heartbeatCount);
                     System.out.println("Sent heartbeat " + heartbeatCount);
                     heartbeatCount++;
+                }
+
+                // Save to checkpoint file
+                if (!failureOccurred) {
+                    PrintWriter writer = new PrintWriter(new FileWriter(CHECKPOINT_FILE));
+                    // Save current light state and current heartbeat count
+                    writer.println(currentLight);
+                    writer.println(heartbeatCount);
+                    writer.close();
                 }
 
                 // Switch traffic lights
@@ -55,7 +77,7 @@ public class TrafficLightControlSys {
                     }
                 }
 
-                Thread.sleep(LIGHT_INTERVAL);
+                Thread.sleep(LIGHT_INTERVAL); // Wait for the next light
             }
         } catch (IOException | InterruptedException e) {
             System.err.println("Exception: " + e.getMessage());
