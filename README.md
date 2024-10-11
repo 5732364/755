@@ -1,7 +1,7 @@
 # Traffic Light System
 
 ### Overview
-Implementing a fail-to-recover strategy through TrafficLightSecondary's code. Expanded upon the content of the previous assignment. We add TrafficLightSecond.java. This part will record the when you crush by txt file. And help TrafficLightControlSys.java continue execution where it failed.
+Implementing a fail to recover strategy through backup system code. Expanded on the content of the last assignment. We add TrafficLightBackup.java. This part will record when you crush by txt file. And help TrafficLightControlSys.java continue execution from where it failed.
 
 ### Team members
 - Liu Xu
@@ -9,9 +9,9 @@ Implementing a fail-to-recover strategy through TrafficLightSecondary's code. Ex
 
 
 ### Instructions
-1. Run HeartBeat.java - Connecting and turning on the monitoring system
-2. Run TrafficLightControlSys - The switch traffic light will have a heartbeat every time it is switched, until a fault occurs. After you run the TrafficLightSecondary then run it again, itwill start counting from where he last recorded.
-3. Run TrafficLightSecondary-  The location of the last failure will be recorded.
+1. Run HeartBeat.java - Connecting and turning on the monitoring system. Make sure the System is running by continuously receiving heartbeat. If the heartbeat messages are not received it can also take action when system fails.
+2. Run TrafficLightControlSys - When heartbeat is running, the switch traffic light will have a heartbeat every time it is switched and only stops when fault occurs. After you run the TrafficLightSecondary then run it again, it will start counting from the last recorded.
+3. Run TrafficLightSecondary-  The last failure will be recorded. And the system will continue if the original system fails to show passive redundancy and recovery.
 
 ### Frameworks Used
 - Java libraries

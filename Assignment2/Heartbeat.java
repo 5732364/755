@@ -1,29 +1,29 @@
-package Assignment2;// Heartbeat.java
+package Assignment2;
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Heartbeat {
     public static final int PORT = 6000;
     public static final int TIMEOUT = 5000; // Heartbeat timeout 5 sec
+    private static volatile long lastHeartbeatTime = System.currentTimeMillis(); // Track last heartbeat time
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Waiting for Traffic Light Controller to connect...");
-            Socket clientSocket = serverSocket.accept(); // Wait for the traffic light system to connect
-            System.out.println("Traffic Light Controller connected");
+
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("Traffic Light controller is connected");
 
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            AtomicLong lastHeartbeatTime = new AtomicLong(System.currentTimeMillis());
 
-            // continuously read heartbeat from the controllers
+            // continuously read heartbeat messages from the controller.
             Thread readerThread = new Thread(() -> {
                 String message;
                 try {
                     while ((message = in.readLine()) != null) {
                         if (message.startsWith("HEARTBEAT")) {
-                            System.out.println("Received " + message); // Log the heartbeat message
-                            lastHeartbeatTime.set(System.currentTimeMillis()); //update last heartbeat time
+                            System.out.println("Received " + message);
+                            // update the last heartbeat
+                            lastHeartbeatTime = System.currentTimeMillis();
                         }
                     }
                 } catch (IOException e) {
@@ -33,18 +33,17 @@ public class Heartbeat {
 
             readerThread.start();
 
-            // Monitor thread to check for missed heartbeats
+            // method to check for missed heartbeats
             Thread monitorThread = new Thread(() -> {
                 while (true) {
-                    if (System.currentTimeMillis() - lastHeartbeatTime.get() > TIMEOUT) {
-                        System.out.println("Traffic Light Controller has stopped responding (missed heartbeat).");
-                        // Reset the last heartbeat time to prevent repeated notifications
-                        lastHeartbeatTime.set(System.currentTimeMillis());
+                    if (System.currentTimeMillis() - lastHeartbeatTime > TIMEOUT) {
+                        System.out.println("Traffic Light controller stopped responding");
+                        // reset the last heartbeat time
+                        lastHeartbeatTime = System.currentTimeMillis();
                     }
-
                     try {
-                        Thread.sleep(TIMEOUT / 2); // Sleep for half the timeout before checking again
-                    } catch (InterruptedException e) {
+                        Thread.sleep(TIMEOUT / 2); // timeout before checking again
+                    } catch (Exception e) {
                         Thread.currentThread().interrupt();
                     }
                 }
@@ -52,7 +51,9 @@ public class Heartbeat {
 
             monitorThread.start();
 
-            // Setting for Keep the program running after crush.
+
+
+            // here keep the program running
             readerThread.join();
             monitorThread.join();
 

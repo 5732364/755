@@ -5,62 +5,69 @@ import java.util.Random;
 
 public class TrafficLightControlSys {
     private static final String MONITOR_HOST = "localhost";
-    private static final int MONITOR_PORT = 6000; // port number
-    private static final int LIGHT_INTERVAL = 2000; // setting light switch for 2 seconds
-    private static final String CHECKPOINT_FILE = "checkpoint.txt"; // file for storing checkpoint state
+    private static final int MONITOR_PORT = 6000; // port num
+    private static final int LIGHT_INTERVAL = 2000; // setting light switch for 2 second
+    private static final String CHECKPOINT_FILE = "checkpoint.txt"; //storing checkpoint state
 
-    // enum is used for three traffic light states
+    // setting three traffic light
     enum Light {
         RedLight, GreenLight, YellowLight
     }
 
     public static void main(String[] args) {
+        // initialize light to red, and heartbeat count
+        Light currentLight = Light.RedLight;
+        int heartbeatCount = 0;
+        boolean failTimes = false;
+
+        // reads from the old checkpoint file
+        try {
+            File cpFile = new File(CHECKPOINT_FILE);
+            if (cpFile.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(cpFile));
+                // reads current light and count of heartbeat
+                currentLight = Light.valueOf(reader.readLine());
+                heartbeatCount = Integer.parseInt(reader.readLine());
+
+                reader.close();
+                System.out.println("checkpoint Light " + currentLight + ", Heartbeat count " + heartbeatCount);
+            } else {
+                System.out.println("Starting.....");
+            }
+        } catch (IOException e) {
+            System.err.println("Exception: " + e.getMessage());
+        }
+
+        // socket connection
         try (Socket socket = new Socket(MONITOR_HOST, MONITOR_PORT);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 
             Random random = new Random();
-            Light currentLight = Light.RedLight; // initialize with red light
-            int heartbeatCount = 0;
-            boolean failureOccurred = false; // flag to simulate failure
-
-            // Check if a checkpoint file exists and load state
-            File checkpointFile = new File(CHECKPOINT_FILE);
-            if (checkpointFile.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(checkpointFile));
-                currentLight = Light.valueOf(reader.readLine()); // Load last saved light state
-                heartbeatCount = Integer.parseInt(reader.readLine()); // Load last heartbeat count
-                reader.close();
-                System.out.println("Resumed from checkpoint with Light: " + currentLight + " and Heartbeat count: " + heartbeatCount);
-            } else {
-                System.out.println("Starting fresh......");
-            }
 
             while (true) {
-                // Simulate random failure with a 20% chance
-                if (!failureOccurred && random.nextInt(100) < 20) {
-                    failureOccurred = true;
-                    System.out.println("A failure occurred in the Traffic Light System. Stopping heartbeats.");
-                    // After failure, stop sending heartbeats but keep running
+                // setting random failure 20%
+                if (!failTimes && random.nextInt(100) < 20) {
+                    // if failure then stop, it was flagged false at start
+                    failTimes = true;
+                    System.out.println("A failure occurred and the process stopped.");
                 }
 
-                // Only send heartbeat if no failure occurred
-                if (!failureOccurred) {
+                // continue sending without fails.
+                if (!failTimes) {
                     out.println("HEARTBEAT " + heartbeatCount);
                     System.out.println("Sent heartbeat " + heartbeatCount);
                     heartbeatCount++;
                 }
-
-                // Save to checkpoint file
-                if (!failureOccurred) {
+                if (!failTimes) {
+                    // saving to checkpointing file.
                     PrintWriter writer = new PrintWriter(new FileWriter(CHECKPOINT_FILE));
-                    // Save current light state and current heartbeat count
                     writer.println(currentLight);
                     writer.println(heartbeatCount);
                     writer.close();
                 }
 
-                // Switch traffic lights
-                if (!failureOccurred) {
+                // switch for Switching lights
+                if (!failTimes) {
                     switch (currentLight) {
                         case RedLight:
                             currentLight = Light.GreenLight;
@@ -77,8 +84,10 @@ public class TrafficLightControlSys {
                     }
                 }
 
-                Thread.sleep(LIGHT_INTERVAL); // Wait for the next light
+
+                Thread.sleep(LIGHT_INTERVAL);
             }
+
         } catch (IOException | InterruptedException e) {
             System.err.println("Exception: " + e.getMessage());
         }
