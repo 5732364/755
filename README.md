@@ -4,8 +4,8 @@
 Implementing a fail to recover strategy through backup system code. Expanded on the content of the last assignment. We add TrafficLightBackup.java. This part will record when you crush by txt file. And help TrafficLightControlSys.java continue execution from where it failed.
 
 ### Team members
-- Liu Xu
-- Weijie Chen
+- Xu
+- Chen
 
 
 ### Instructions
