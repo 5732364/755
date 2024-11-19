@@ -1,20 +1,20 @@
 # Traffic Light System
 
 ### Overview
-Implementing a fail to recover strategy through backup system code. Expanded on the content of the last assignment. We add TrafficLightBackup.java. This part will record when you crush by txt file. And help TrafficLightControlSys.java continue execution from where it failed.
+This project adds secure session management to a simple traffic light control system. Users can log in to manage the traffic light. It shows how to use authentication, authorization, and secure session handling in a lightweight web app.
 
 ### Team members
 - Xu
 - Chen
 
-
 ### Instructions
-1. Run HeartBeat.java - Connecting and turning on the monitoring system. Make sure the System is running by continuously receiving heartbeat. If the heartbeat messages are not received it can also take action when system fails.
-2. Run TrafficLightControlSys - When heartbeat is running, the switch traffic light will have a heartbeat every time it is switched and only stops when fault occurs. After you run the TrafficLightSecondary then run it again, it will start counting from the last recorded.
-3. Run TrafficLightSecondary-  The last failure will be recorded. And the system will continue if the original system fails to show passive redundancy and recovery.
+1. Run app.py - Start the backend by running app.py. The system will create a local server where users can log in and interact with the traffic light control system.
+2. Login to the System using the following credentials.admin / admin_pass, user / user_pass, guest / guest_pass
+3. Control the Traffic Light
+4. Logout
 
 ### Frameworks Used
-- Java libraries
-- Java.io.*
-- Java.net.*
-- Java.util.random
+- Flask
+- Flask-SQLAlchemy
+- Python UUID
+- SQLite for database
