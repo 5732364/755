@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light Control</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: black;
+            text-align: center;
+        }
+
+        #login, #traffic-control {
+            margin: 20px auto;
+            padding: 20px;
+            width: 300px;
+            border: 1px solid gray;
+            background-color: white;
+        }
+
+        input, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+
+        .red-button {
+            background-color: red;
+            color: white;
+        }
+
+        .yellow-button {
+            background-color: yellow;
+            color: black;
+        }
+
+        .green-button {
+            background-color: green;
+            color: white;
+        }
+
+        .logout-button {
+            background-color: orange;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Traffic Light Control System</h1>
+
+    <p>Log in to access the controls.</p>
+
+    <div id="login">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="login-message"></p>
+    </div>
+
+    <div id="traffic-control" style="display: none;">
+        <h2>Control the Traffic Light</h2>
+        <button class="red-button" onclick="changeLight('Red')">Red - Stop</button>
+        <button class="yellow-button" onclick="changeLight('Yellow')">Yellow - Caution</button>
+        <button class="green-button" onclick="changeLight('Green')">Green - Go</button>
+        <p id="traffic-message"></p>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        let sessionId = null;
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.session_id) {
+                    sessionId = data.session_id;
+                    document.getElementById("login-message").textContent = "Login successful!";
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("traffic-control").style.display = "block";
+                } else {
+                    document.getElementById("login-message").textContent = data.message;
+                }
+            });
+        }
+
+        function changeLight(color) {
+            fetch("/traffic_light", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Session-ID": sessionId
+                },
+                body: JSON.stringify({ action: color })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("traffic-message").textContent = data.message;
+            });
+        }
+
+        function logout() {
+            fetch("/logout", {
+                method: "POST",
+                headers: { "Session-ID": sessionId }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("traffic-message").textContent = data.message;
+                document.getElementById("traffic-control").style.display = "none";
+                document.getElementById("login").style.display = "block";
+                sessionId = null;
+            });
+        }
+    </script>
+</body>
+</html>
